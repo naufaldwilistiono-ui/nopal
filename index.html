@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Kependudukan Kota Madiun 2025</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
+  <style>
+    :root{
+      --green-700:#006747;
+      --green-400:#00b894;
+      --card-bg: rgba(255,255,255,0.85);
+      --radius:14px;
+      --shadow:0 6px 20px rgba(0,0,0,0.15);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Poppins",sans-serif;
+      background:url('kota madiun.jpg') center/cover fixed no-repeat;
+      color:#123;
+      position:relative;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:rgba(0,103,71,0.25);
+      backdrop-filter:blur(3px);
+      z-index:-1;
+    }
+
+    header{
+      position:relative;
+      height:300px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:white;
+      border-bottom-left-radius:30px;
+      border-bottom-right-radius:30px;
+    }
+    .logo-left,.logo-right{
+      position:absolute;
+      top:18px;
+      width:80px;height:80px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,0.2);
+      padding:8px;border-radius:12px;
+      box-shadow:var(--shadow);
+    }
+    .logo-left{left:18px}
+    .logo-right{right:18px}
+    header .title{
+      position:relative;z-index:2;max-width:900px;padding:10px 20px;
+    }
+    header h1{font-size:2.6rem;margin:0 0 8px;font-weight:700;text-shadow:0 3px 6px rgba(0,0,0,0.3);}
+    header p{margin:0;opacity:0.95;font-weight:500;text-shadow:0 2px 5px rgba(0,0,0,0.3);}
+
+    main{padding:28px 6%;max-width:1200px;margin:0 auto 60px;}
+    .map-wrap{text-align:center;margin-bottom:28px;}
+    .map-wrap img{
+      width:80%;
+      max-width:900px;
+      border-radius:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .chart-container{
+      background:var(--card-bg);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:20px;
+      margin-bottom:30px;
+      text-align:center;
+    }
+    .data-card{
+      background:var(--card-bg);
+      padding:20px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      margin-top:20px;
+    }
+    table{width:100%;border-collapse:collapse;font-size:0.95rem;}
+    th,td{
+      padding:10px 12px;
+      text-align:center;
+      border-bottom:1px dashed rgba(0,0,0,0.08);
+    }
+    th{
+      background:linear-gradient(90deg,var(--green-700),var(--green-400));
+      color:white;font-weight:600;
+    }
+    tbody tr:hover{background:rgba(0,0,0,0.04);}
+    footer{
+      margin-top:40px;
+      text-align:center;
+      padding:18px;
+      color:white;
+      background:rgba(0,103,71,0.85);
+      border-radius:12px;
+      box-shadow:var(--shadow);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-left">
+      <img src="logo kota madiun.png" alt="Logo Kota Madiun" style="max-width:100%;max-height:100%;">
+    </div>
+    <div class="logo-right">
+      <img src="logo bps.png" alt="Logo BPS" style="max-width:100%;max-height:100%;">
+    </div>
+    <div class="title">
+      <h1>Data Kependudukan Kota Madiun 2025</h1>
+      <p>Selamat datang di portal data — jelajahi dinamika penduduk Kota Madiun dengan visual yang informatif dan elegan.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="map-wrap">
+      <img src="peta kota madiun.jpg" alt="Peta Batas Administrasi Kota Madiun">
+    </div>
+
+    <div class="chart-container">
+      <h3>Distribusi Penduduk Menurut Kelompok Umur</h3>
+      <canvas id="histogramChart" height="250"></canvas>
+    </div>
+
+    <div class="data-card">
+      <h3 style="margin-top:0">Tabel: Penduduk Menurut Kelompok Umur</h3>
+      <table id="pendudukTable">
+        <thead>
+          <tr><th>Kelompok Umur</th><th>Laki-laki</th><th>Perempuan</th><th>Jumlah</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <footer>
+      © 2025 Dinas Kependudukan Kota Madiun — Data: BPS Kota Madiun | Visual by Nopal
+    </footer>
+  </main>
+
+  <script>
+    const pendudukData = [
+      {"Kelompok Umur":"0-4","Laki-laki":5525,"Perempuan":5168,"Jumlah":10693},
+      {"Kelompok Umur":"5-9","Laki-laki":6850,"Perempuan":6447,"Jumlah":13297},
+      {"Kelompok Umur":"10-14","Laki-laki":7551,"Perempuan":7357,"Jumlah":14908},
+      {"Kelompok Umur":"15-19","Laki-laki":7883,"Perempuan":7578,"Jumlah":15461},
+      {"Kelompok Umur":"20-24","Laki-laki":8164,"Perempuan":7594,"Jumlah":15758},
+      {"Kelompok Umur":"25-29","Laki-laki":7678,"Perempuan":7359,"Jumlah":15037},
+      {"Kelompok Umur":"30-34","Laki-laki":6979,"Perempuan":6956,"Jumlah":13935},
+      {"Kelompok Umur":"35-39","Laki-laki":6801,"Perempuan":6802,"Jumlah":13603},
+      {"Kelompok Umur":"40-44","Laki-laki":7958,"Perempuan":7999,"Jumlah":15957},
+      {"Kelompok Umur":"45-49","Laki-laki":7540,"Perempuan":7595,"Jumlah":15135},
+      {"Kelompok Umur":"50-54","Laki-laki":6912,"Perempuan":7236,"Jumlah":14148},
+      {"Kelompok Umur":"55-59","Laki-laki":6215,"Perempuan":6550,"Jumlah":12765},
+      {"Kelompok Umur":"60-64","Laki-laki":5896,"Perempuan":5821,"Jumlah":11717},
+      {"Kelompok Umur":"65-69","Laki-laki":5110,"Perempuan":5240,"Jumlah":10350},
+      {"Kelompok Umur":"70+","Laki-laki":4200,"Perempuan":4600,"Jumlah":8800}
+    ];
+
+    const tbody=document.querySelector("#pendudukTable tbody");
+    pendudukData.forEach(r=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${r["Kelompok Umur"]}</td><td>${r["Laki-laki"].toLocaleString()}</td><td>${r["Perempuan"].toLocaleString()}</td><td>${r["Jumlah"].toLocaleString()}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    const ctx=document.getElementById("histogramChart").getContext("2d");
+    new Chart(ctx,{
+      type:"bar",
+      data:{
+        labels:pendudukData.map(d=>d["Kelompok Umur"]),
+        datasets:[{
+          label:"Jumlah Penduduk",
+          data:pendudukData.map(d=>d["Jumlah"]),
+          backgroundColor:pendudukData.map((_,i)=>i%2?"rgba(0,184,148,0.75)":"rgba(0,103,71,0.75)"),
+          borderRadius:4,
+          trendlineLinear:{
+            color:"rgba(0,0,0,0.6)",
+            lineStyle:"dashed",
+            width:2
+          }
+        }]
+      },
+      options:{
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{grid:{display:false}},
+          y:{beginAtZero:true,grid:{color:"rgba(0,0,0,0.05)"}}
+        }
+      }
+    });
+  </script>
+</body>
+</html>
